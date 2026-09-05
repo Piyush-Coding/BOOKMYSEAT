@@ -1,0 +1,106 @@
+{% extends "users/basic.html" %}
+
+{% block title %}Payment - BookMySeat{% endblock %}
+
+{% block content %}
+
+<h1>Admin Analytics Dashboard</h1>
+
+<div class="cards">
+
+    <div class="card">
+        <h3>Today's Revenue</h3>
+        <h2>₹{{ analytics.daily_revenue }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>Weekly Revenue</h3>
+        <h2>₹{{ analytics.weekly_revenue }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>Monthly Revenue</h3>
+        <h2>₹{{ analytics.monthly_revenue }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>Total Orders</h3>
+        <h2>{{ analytics.total_orders }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>Cancelled Orders</h3>
+        <h2>{{ analytics.cancelled_orders }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>Cancellation Rate</h3>
+        <h2>{{ analytics.cancellation_rate }}%</h2>
+    </div>
+
+</div>
+
+
+<h2>Most Popular Movies</h2>
+
+<table>
+    <tr>
+        <th>Movie</th>
+        <th>Bookings</th>
+    </tr>
+
+    {% for movie in analytics.popular_movies %}
+    <tr>
+        <td>{{ movie.name }}</td>
+        <td>{{ movie.booking_count }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="2">No bookings found.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+<h2>Busiest Theaters</h2>
+
+<table>
+    <tr>
+        <th>Theater</th>
+        <th>Total Seats</th>
+        <th>Booked Seats</th>
+        <th>Occupancy</th>
+    </tr>
+
+    {% for theater in analytics.busiest_theaters %}
+    <tr>
+        <td>{{ theater.name }}</td>
+        <td>{{ theater.total_seats }}</td>
+        <td>{{ theater.booked_seats }}</td>
+        <td>{{ theater.occupancy_rate|floatformat:2 }}%</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">No theater data.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+<h2>Peak Booking Hours</h2>
+
+<table>
+    <tr>
+        <th>Hour</th>
+        <th>Bookings</th>
+    </tr>
+
+    {% for hour in analytics.peak_hours %}
+    <tr>
+        <td>{{ hour.hour }}:00</td>
+        <td>{{ hour.booking_count }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
