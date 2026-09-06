@@ -30,92 +30,20 @@ def register(request):
 
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False
+
+            # Email verification nahi chahiye
+            user.is_active = True
             user.save()
 
-            current_site = get_current_site(request)
+            # Direct login
+            login(request, user)
 
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-
-            activation_url = (
-                f"{request.scheme}://{current_site.domain}"
-                f"/users/activate/{uid}/{token}/"
-            )
-
-            context = {
-                "user": user,
-                "activation_url": activation_url,
-                "domain": current_site.domain,
-            }
-
-            html_content = render_to_string(
-                "emails/activation_email.html",
-                context
-            )
-
-            plain_content = (
-                f"Hi {user.username},\n\n"
-                "Please verify your email address to complete "
-                "registration on BookMySeat by clicking the link below:\n\n"
-                f"{activation_url}\n\n"
-                "Thank you!"
-            )
-
-            subject = "Verify Your Email - BookMySeat"
-
-            from_email = (
-                getattr(settings, "DEFAULT_FROM_EMAIL", None)
-                or settings.EMAIL_HOST_USER
-            )
-
-            try:
-                email_msg = EmailMultiAlternatives(
-                    subject,
-                    plain_content,
-                    from_email,
-                    [user.email],
-                )
-
-                email_msg.attach_alternative(
-                    html_content,
-                    "text/html"
-                )
-
-                email_msg.send(fail_silently=False)
-
-                logger.info(
-                    f"Verification email successfully sent to {user.email}"
-                )
-
-            except Exception as e:
-                logger.exception(
-                    f"Failed to send verification email to {user.email}: {e}"
-                )
-
-                messages.error(
-                    request,
-                    "Registration completed, but verification email could "
-                    "not be sent. Please try again later."
-                )
-
-                return redirect("register")
-
-            return render(
-                request,
-                "users/email_verification_sent.html",
-                {"email": user.email},
-            )
+            return redirect('/')
 
     else:
         form = UserRegisterform()
 
-    return render(
-        request,
-        "users/register.html",
-        {"forms": form},
-    )
-
+    return render(request, 'users/register.html', {'forms': form})
 
 def activate_account(request, uidb64, token):
     try:
